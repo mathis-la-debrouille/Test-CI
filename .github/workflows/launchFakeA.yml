@@ -1,0 +1,11 @@
+name: Build Fake A
+
+on:
+  workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest  
+        steps:
+            - name: super build
+              run: echo "projet A"
