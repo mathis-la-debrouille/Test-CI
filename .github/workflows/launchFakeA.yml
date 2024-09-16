@@ -1,6 +1,8 @@
 name: Build Fake A
 
 on:
+    repository_dispatch:
+        types: [trigger_build_fake_a]
     workflow_dispatch:
         inputs:
             printval:
@@ -12,7 +14,10 @@ jobs:
     build:
         runs-on: ubuntu-latest  
         steps:
-            - name: super build
-              run: echo "projet A"
-              env:
-                PRINTVAL: ${{inputs.printval}}
+            - name: Super build
+              run: |
+                if [ -n "${{ github.event.client_payload.printval }}" ]; then
+                    echo "Projet A avec la valeur : ${{ github.event.client_payload.printval }}"
+                else
+                    echo "Projet A avec la valeur : ${{ inputs.printval }}"
+                fi
