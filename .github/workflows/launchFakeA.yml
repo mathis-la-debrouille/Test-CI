@@ -2,6 +2,11 @@ name: Build Fake A
 
 on:
     workflow_dispatch:
+        inputs:
+            printval:
+                description: 'valeur à afficher'
+                required: false
+                type: string
 
 jobs:
     build:
@@ -9,3 +14,5 @@ jobs:
         steps:
             - name: super build
               run: echo "projet A"
+              env:
+                PRINTVAL: ${{inputs.printval}}
