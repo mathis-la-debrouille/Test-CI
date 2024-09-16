@@ -42,6 +42,7 @@ jobs:
             await octokit.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'launchFakeA.yml', # Le nom du fichier du workflow à déclencher
-              ref: 'main',           # Branche sur laquelle déclencher le workflow
+              workflow_id: 'launchFakeA.yml',
+              ref: 'main',
+              token: ${{secrets.PERSONAL_TOKEN}}
             });
