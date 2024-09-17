@@ -12,7 +12,7 @@ on:
 
 jobs:
     build:
-        runs-on: ubuntu-latest  
+        runs-on: ubuntu-latest
         steps:
             - name: Super build
               run: |
@@ -21,3 +21,24 @@ jobs:
                 else
                     echo "Projet A avec la valeur : ${{ inputs.printval }}"
                 fi
+
+    checkup:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                directory: [
+                    service1,
+                    service2,
+                    service3,
+                    service4,
+                    service5,
+                ]
+        steps:
+            - name: Checkout ${{ matrix.directory }}
+              uses: actions/checkout@v3
+
+            - name: Navigate and list files
+              run: |
+                cd src/${{ matrix.directory }}
+                echo "Directory: ${{ matrix.directory }}"
+                ls
