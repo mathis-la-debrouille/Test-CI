@@ -20,7 +20,7 @@ jobs:
         steps:
             - name: Log input
               run: |
-                  echo "Projet A avec la valeur : ${{ inputs.buildType }}"
+                  echo "Projet A avec la valeur ${{ github.event.inputs.buildType }}"
 
     checkup:
         runs-on: ubuntu-latest
@@ -56,27 +56,27 @@ jobs:
                 fi
             
             - name: Skip job if no changes
-              if: steps.check_changes.outputs.build_needed == 'false' && inputs.buildType != 'force'
+              if: steps.check_changes.outputs.build_needed == 'false' && github.event.inputs.buildType != 'force'
               run: |
                 echo "Pas de build - marking as skipped"
               continue-on-error: true
             
             - name: Build process
-              if: steps.check_changes.outputs.build_needed == 'true' || inputs.buildType == 'force'
+              if: steps.check_changes.outputs.build_needed == 'true' || github.event.inputs.buildType == 'force'
               run: |
                 echo "On build"
                 # Add your build steps here
 
             - name: try something
-              run: echo ${{ inputs.buildType }}
+              run: echo ${{ github.event.inputs.buildType }}
    
             - name: Add labels to PR
-              if: inputs.buildType == 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || inputs.buildType == 'force' )
+              if: github.event.inputs.buildType == 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || github.event.inputs.buildType == 'force' )
               uses: actions-ecosystem/action-add-labels@v1
               with:
                 labels: |
                   ${{ matrix.directory }}
 
             - name: No Label this is not a pull_request
-              if: inputs.buildType != 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || inputs.buildType == 'force' )
+              if: github.event.inputs.buildType != 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || github.event.inputs.buildType == 'force' )
               run: echo "This is not a pull request, skipping label addition."
