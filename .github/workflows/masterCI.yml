@@ -33,14 +33,7 @@ jobs:
         
       - name: Check if this is a pull request or a commit
         id: check_pr
-        run: |
-                PR_NUMBER=$(gh pr view --json number --jq .number || echo "null")
-                if [ "$PR_NUMBER" != "null" ]; then
-                    echo "::set-output name=is_pr::true"
-                else
-                    echo "::set-output name=is_pr::false"
-                    echo "Not a pull request, this is a commit."
-                fi
+        run: echo ${{ github.event_name }}
 
   trigger:
     runs-on: ubuntu-latest
