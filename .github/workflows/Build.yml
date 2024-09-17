@@ -67,18 +67,17 @@ jobs:
                 echo "On build"
                 # Add your build steps here
 
-            - name: Add Label
+            - name: Add Label to Pull Request
               if: steps.check_changes.outputs.build_needed == 'true'
               run: |
-                # Fetch the pull request or commit details
+                # Fetch the pull request number
                 PR_NUMBER=$(gh pr view --json number --jq .number || echo "null")
+
                 if [ "$PR_NUMBER" != "null" ]; then
                     # Add a label to the pull request
                     gh pr edit $PR_NUMBER --add-label "${{ matrix.directory }}"
                 else
-                    # Add a label to the commit
-                    gh api repos/${{ github.repository }}/commits/${{ github.sha }}/labels \
-                    -f labels="${{ matrix.directory }}"
+                    echo "No pull request found, skipping labeling."
                 fi
               env:
                 GH_TOKEN: ${{ github.token }}
