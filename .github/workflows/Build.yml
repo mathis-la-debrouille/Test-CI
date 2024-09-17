@@ -1,8 +1,8 @@
-name: Build Fake A
+name: Build
 
 on:
     repository_dispatch:
-        types: [trigger_build_fake_a]
+        types: [trigger_build]
     workflow_dispatch:
         inputs:
             printval:
@@ -39,6 +39,10 @@ jobs:
               with:
                 fetch-depth: 2 # To ensure we have the last two commits
 
+            - name: Install GitHub CLI
+              run: |
+                sudo apt-get install -y gh
+
             - name: Check for changes
               id: check_changes
               run: |
@@ -61,3 +65,18 @@ jobs:
               run: |
                 echo "On build"
                 # Add your build steps here
+
+            - name: Add Label
+              if: steps.check_changes.outputs.build_needed == 'true'
+              run: |
+                # Fetch the pull request or commit details
+                PR_NUMBER=$(gh pr view --json number --jq .number || echo "null")
+                if [ "$PR_NUMBER" != "null" ]; then
+                    # Add a label to the pull request
+                    gh pr edit $PR_NUMBER --add-label "${{ matrix.directory }}"
+                else
+                    # Add a label to the commit
+                    gh api repos/${{ github.repository }}/commits/${{ github.sha }}/labels \
+                    -f labels="${{ matrix.directory }}"
+                fi
+              
