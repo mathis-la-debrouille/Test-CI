@@ -53,6 +53,7 @@ jobs:
                 else
                     echo "On build"
                     echo "::set-output name=build_needed::true"
+                fi
             
             - name: Skip job if no changes
               if: steps.check_changes.outputs.build_needed == 'false'
