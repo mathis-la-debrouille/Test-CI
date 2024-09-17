@@ -41,7 +41,7 @@ jobs:
       - name: Dispatch event to trigger Build
         run: |
             build_type=$(if [ "${{ github.event_name }}" == "pull_request" ]; then echo "pull_request"; else echo "other"; fi)
-            echo "Event Type: $event_type"
+            echo "Event Type: $build_type"
             curl -X POST \
             -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
