@@ -36,9 +36,14 @@ jobs:
         steps:
             - name: Checkout ${{ matrix.directory }}
               uses: actions/checkout@v3
+              with:
+                fetch-depth: 2 # To ensure we have at least the last two commits
 
-            - name: Navigate and list files
+            - name: Check if there were changes in the directory
               run: |
                 cd src/${{ matrix.directory }}
-                echo "Directory: ${{ matrix.directory }}"
-                ls
+                if git diff --quiet HEAD^ HEAD .; then
+                    echo "Pas de build"
+                else
+                    echo "On build"
+                fi
