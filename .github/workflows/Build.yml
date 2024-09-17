@@ -5,22 +5,22 @@ on:
         types: [trigger_build]
     workflow_dispatch:
         inputs:
-            printval:
-                description: 'valeur à afficher'
-                required: false
-                type: string
+            buildType:
+                description: 'Type de build'
+                required: true
+                type: choice
+                options: 
+                  - force
+                  - pull_request
+                  - other
 
 jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - name: Super build
+            - name: Log input
               run: |
-                if [ -n "${{ github.event.client_payload.printval }}" ]; then
-                    echo "Projet A avec la valeur : ${{ github.event.client_payload.printval }}"
-                else
-                    echo "Projet A avec la valeur : ${{ inputs.printval }}"
-                fi
+                  echo "Projet A avec la valeur : ${{ inputs.buildType }}"
 
     checkup:
         runs-on: ubuntu-latest
@@ -37,7 +37,7 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v3
               with:
-                fetch-depth: 2 # To ensure we have the last two commits
+                fetch-depth: 2
 
             - name: Install GitHub CLI
               run: |
@@ -56,28 +56,27 @@ jobs:
                 fi
             
             - name: Skip job if no changes
-              if: steps.check_changes.outputs.build_needed == 'false'
+              if: steps.check_changes.outputs.build_needed == 'false' && inputs.buildType != 'force'
               run: |
                 echo "Pas de build - marking as skipped"
               continue-on-error: true
             
             - name: Build process
-              if: steps.check_changes.outputs.build_needed == 'true'
+              if: steps.check_changes.outputs.build_needed == 'true' || inputs.buildType == 'force'
               run: |
                 echo "On build"
                 # Add your build steps here
 
             - name: try something
-              run: echo ${{ github.event_name }}
+              run: echo ${{ inputs.buildType }}
    
-
             - name: Add labels to PR
-              if: github.event_name == 'pull_request' && steps.check_changes.outputs.build_needed == 'true'
+              if: inputs.buildType == 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || inputs.buildType == 'force' )
               uses: actions-ecosystem/action-add-labels@v1
               with:
                 labels: |
                   ${{ matrix.directory }}
 
-            - name: No Label this is a commit
-              if: github.event_name != 'pull_request' && steps.check_changes.outputs.build_needed == 'true'
+            - name: No Label this is not a pull_request
+              if: inputs.buildType != 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || inputs.buildType == 'force' )
               run: echo "This is not a pull request, skipping label addition."

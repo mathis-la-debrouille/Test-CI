@@ -38,10 +38,12 @@ jobs:
   trigger:
     runs-on: ubuntu-latest
     steps:
-      - name: Dispatch event to trigger Build
+      - name: Trigger dispatch with event_type
         run: |
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/dispatches \
-            -d '{"event_type":"trigger_build", "client_payload":{"printval":"${{ inputs.printval }}"}}'
+                event_type=$(if [ "${{ github.event_name }}" == "pull_request" ]; then echo "pull_request"; else echo "other"; fi)
+                curl -X POST \
+                  -H "Accept: application/vnd.github.everest-preview+json" \
+                  -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                  https://api.github.com/repos/OWNER/REPO/dispatches \
+                  -d '{"event_type":"trigger_build", "client_payload":{"buildType":"'"$event_type"'"}}'
+
