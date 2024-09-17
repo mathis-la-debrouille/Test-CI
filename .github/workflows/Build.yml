@@ -67,18 +67,24 @@ jobs:
                 echo "On build"
                 # Add your build steps here
 
-            - name: Add Label to Pull Request
-              if: steps.check_changes.outputs.build_needed == 'true'
+            - name: For Label -> Check if this is a pull request or a commit
+              id: check_pr
               run: |
-                # Fetch the pull request number
                 PR_NUMBER=$(gh pr view --json number --jq .number || echo "null")
-
                 if [ "$PR_NUMBER" != "null" ]; then
-                    # Add a label to the pull request
-                    gh pr edit $PR_NUMBER --add-label "${{ matrix.directory }}"
+                    echo "::set-output name=is_pr::true"
                 else
-                    echo "No pull request found, skipping labeling."
+                    echo "::set-output name=is_pr::false"
+                    echo "Not a pull request, this is a commit."
                 fi
-              env:
-                GH_TOKEN: ${{ github.token }}
-              
+
+            - name: Add labels to PR
+              if: steps.check_pr.outputs.is_pr == 'true' && steps.check_changes.outputs.build_needed == 'true'
+              uses: actions-ecosystem/action-add-labels@v1
+              with:
+                labels: |
+                  ${{ matrix.directory }}
+
+            - name: No Label this is a commit
+              if: steps.check_pr.outputs.is_pr == 'false' && steps.check_changes.outputs.build_needed == 'true'
+              run: echo "This is not a pull request, skipping label addition."
