@@ -13,6 +13,7 @@ on:
                   - force
                   - pull_request
                   - other
+                default: 'default'
 
 jobs:
     build:
@@ -20,7 +21,7 @@ jobs:
         steps:
             - name: Log input
               run: |
-                  echo "Projet A avec la valeur ${{ github.event.inputs.buildType }}"
+                  echo "logging input ${{ github.event.inputs.buildType }}"
 
     checkup:
         runs-on: ubuntu-latest
