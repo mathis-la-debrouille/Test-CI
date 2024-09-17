@@ -34,16 +34,30 @@ jobs:
                     service5,
                 ]
         steps:
-            - name: Checkout ${{ matrix.directory }}
+            - name: Checkout code
               uses: actions/checkout@v3
               with:
-                fetch-depth: 2 # To ensure we have at least the last two commits
+                fetch-depth: 2 # To ensure we have the last two commits
 
-            - name: Check if there were changes in the directory
+            - name: Check for changes
+              id: check_changes
               run: |
                 cd src/${{ matrix.directory }}
                 if git diff --quiet HEAD^ HEAD .; then
                     echo "Pas de build"
+                    echo "::set-output name=build_needed::false"
                 else
                     echo "On build"
-                fi
+                    echo "::set-output name=build_needed::true"
+            
+            - name: Skip job if no changes
+              if: steps.check_changes.outputs.build_needed == 'false'
+              run: |
+                echo "Pas de build - marking as skipped"
+              continue-on-error: true
+            
+            - name: Build process
+              if: steps.check_changes.outputs.build_needed == 'true'
+              run: |
+                echo "On build"
+                # Add your build steps here
