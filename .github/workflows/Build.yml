@@ -23,16 +23,16 @@ jobs:
           buildType: ${{ steps.log_build_type.outputs.buildType }}
         steps:
             - name: Log input
+              id: log_build_type
               run: |
                 # Set the buildType based on the event
                 if [ -n "${{ github.event.client_payload.buildType }}" ]; then
                   build_type="${{ github.event.client_payload.buildType }}"
                 else
-                  build_type="${{ needs.build.outputs.buildType }}"
+                  build_type="${{ github.event.inputs.buildType }}"
                 fi
-                echo "::set-output name=buildType::$build_type"
+                echo "buildType=$build_type" >> "$GITHUB_OUTPUT"
                 echo "logging input: $build_type"
-
 
 
     checkup:
