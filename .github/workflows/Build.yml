@@ -18,13 +18,22 @@ on:
 
 jobs:
     build:
-        if: ${{ github.event.client_payload.buildType }}
         runs-on: ubuntu-latest
+        outputs:
+          buildType: ${{ steps.log_build_type.outputs.buildType }}
         steps:
             - name: Log input
               run: |
-                  echo "logging input ${{ github.event.client_payload.buildType }}"
-                  
+                # Set the buildType based on the event
+                if [ -n "${{ github.event.client_payload.buildType }}" ]; then
+                  build_type="${{ github.event.client_payload.buildType }}"
+                else
+                  build_type="${{ needs.build.outputs.buildType }}"
+                fi
+                echo "::set-output name=buildType::$build_type"
+                echo "logging input: $build_type"
+
+
 
     checkup:
         runs-on: ubuntu-latest
@@ -60,27 +69,27 @@ jobs:
                 fi
             
             - name: Skip job if no changes
-              if: steps.check_changes.outputs.build_needed == 'false' && github.event.inputs.buildType != 'force'
+              if: steps.check_changes.outputs.build_needed == 'false' && needs.build.outputs.buildType != 'force'
               run: |
                 echo "Pas de build - marking as skipped"
               continue-on-error: true
             
             - name: Build process
-              if: steps.check_changes.outputs.build_needed == 'true' || github.event.inputs.buildType == 'force'
+              if: steps.check_changes.outputs.build_needed == 'true' || needs.build.outputs.buildType == 'force'
               run: |
                 echo "On build"
                 # Add your build steps here
 
             - name: try something
-              run: echo ${{ github.event.inputs.buildType }}
+              run: echo ${{ needs.build.outputs.buildType }}
    
             - name: Add labels to PR
-              if: github.event.inputs.buildType == 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || github.event.inputs.buildType == 'force' )
+              if: needs.build.outputs.buildType == 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || needs.build.outputs.buildType == 'force' )
               uses: actions-ecosystem/action-add-labels@v1
               with:
                 labels: |
                   ${{ matrix.directory }}
 
             - name: No Label this is not a pull_request
-              if: github.event.inputs.buildType != 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || github.event.inputs.buildType == 'force' )
+              if: needs.build.outputs.buildType != 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || needs.build.outputs.buildType == 'force' )
               run: echo "This is not a pull request, skipping label addition."
