@@ -70,9 +70,11 @@ jobs:
                 # Get the list of changed files
                 changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
                 
+                echo "Gonna show files"
                 # Check if any of the changed files are in the target directory
                 build_needed="false"
                 for file in $changed_files; do
+                  echo $file
                   if [[ "$file" == $directory* ]]; then
                     build_needed="true"
                     break
