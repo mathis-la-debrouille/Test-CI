@@ -57,20 +57,34 @@ jobs:
               run: |
                 sudo apt-get install -y gh
 
-            - name: Fetch main branch
-              run: |
-                git fetch origin main
+            - name: Get changed files
+              id: changed-files
+              uses: tj-actions/changed-files@v14.6            
 
             - name: Check for changes
               id: check_changes
               run: |
-                cd src/${{ matrix.directory }}
-                if git diff --quiet origin/main...HEAD .; then
-                    echo "Pas de build"
-                    echo "::set-output name=build_needed::false"
+                # Define the directory to monitor
+                directory="src/${{ matrix.directory }}"
+                
+                # Get the list of changed files
+                changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+                
+                # Check if any of the changed files are in the target directory
+                build_needed="false"
+                for file in $changed_files; do
+                  if [[ "$file" == $directory* ]]; then
+                    build_needed="true"
+                    break
+                  fi
+                done
+
+                if [[ "$build_needed" == "true" ]]; then
+                  echo "On build"
+                  echo "::set-output name=build_needed::true"
                 else
-                    echo "On build"
-                    echo "::set-output name=build_needed::true"
+                  echo "Pas de build"
+                  echo "::set-output name=build_needed::false"
                 fi
             
             - name: Skip job if no changes
