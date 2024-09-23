@@ -36,6 +36,8 @@ jobs:
 
     checkup:
         runs-on: ubuntu-latest
+        permissions:
+          issues: write
         needs: build
         strategy:
             matrix:
