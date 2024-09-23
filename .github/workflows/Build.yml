@@ -105,12 +105,12 @@ jobs:
               run: echo ${{ needs.build.outputs.buildType }}
    
             - name: Add labels to PR
-              if: needs.build.outputs.buildType == 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || needs.build.outputs.buildType == 'force' )
+              if: needs.build.outputs.buildType == 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || needs.build.outputs.buildType == 'force')
               uses: actions-ecosystem/action-add-labels@v1
               with:
                 labels: |
                   ${{ matrix.directory }}
-                number: ${{ github.event.number }}
+                number: ${{ github.event.client_payload.pull_request_number }}
 
             - name: No Label this is not a pull_request
               if: needs.build.outputs.buildType != 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || needs.build.outputs.buildType == 'force' )
