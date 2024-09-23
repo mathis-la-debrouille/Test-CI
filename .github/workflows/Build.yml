@@ -3,27 +3,41 @@ name: Build
 on:
     repository_dispatch:
         types: [trigger_build]
+
     workflow_dispatch:
         inputs:
-            printval:
-                description: 'valeur à afficher'
-                required: false
-                type: string
+            buildType:
+                description: 'Type de build'
+                required: true
+                type: choice
+                options: 
+                  - force
+                  - pull_request
+                  - other
+                default: 'default'
 
 jobs:
     build:
         runs-on: ubuntu-latest
+        outputs:
+          buildType: ${{ steps.log_build_type.outputs.buildType }}
         steps:
-            - name: Super build
+            - name: Log input
+              id: log_build_type
               run: |
-                if [ -n "${{ github.event.client_payload.printval }}" ]; then
-                    echo "Projet A avec la valeur : ${{ github.event.client_payload.printval }}"
+                # Set the buildType based on the event
+                if [ -n "${{ github.event.client_payload.buildType }}" ]; then
+                  build_type="${{ github.event.client_payload.buildType }}"
                 else
-                    echo "Projet A avec la valeur : ${{ inputs.printval }}"
+                  build_type="${{ github.event.inputs.buildType }}"
                 fi
+                echo "buildType=$build_type" >> "$GITHUB_OUTPUT"
+                echo "logging input: $build_type"
+
 
     checkup:
         runs-on: ubuntu-latest
+        needs: build
         strategy:
             matrix:
                 directory: [
@@ -37,48 +51,67 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v3
               with:
-                fetch-depth: 2 # To ensure we have the last two commits
+                fetch-depth: 2
 
             - name: Install GitHub CLI
               run: |
                 sudo apt-get install -y gh
 
+            - name: Get changed files
+              id: changed-files
+              uses: tj-actions/changed-files@v45
+
             - name: Check for changes
               id: check_changes
               run: |
-                cd src/${{ matrix.directory }}
-                if git diff --quiet HEAD^ HEAD .; then
-                    echo "Pas de build"
-                    echo "::set-output name=build_needed::false"
+                # Define the directory to monitor
+                directory="src/${{ matrix.directory }}"
+                
+                # Get the list of changed files
+                changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+                
+                echo "Gonna show files"
+                # Check if any of the changed files are in the target directory
+                build_needed="false"
+                for file in $changed_files; do
+                  echo $file
+                  if [[ "$file" == $directory* ]]; then
+                    build_needed="true"
+                    break
+                  fi
+                done
+
+                if [[ "$build_needed" == "true" ]]; then
+                  echo "On build"
+                  echo "::set-output name=build_needed::true"
                 else
-                    echo "On build"
-                    echo "::set-output name=build_needed::true"
+                  echo "Pas de build"
+                  echo "::set-output name=build_needed::false"
                 fi
             
             - name: Skip job if no changes
-              if: steps.check_changes.outputs.build_needed == 'false'
+              if: steps.check_changes.outputs.build_needed == 'false' && needs.build.outputs.buildType != 'force'
               run: |
                 echo "Pas de build - marking as skipped"
               continue-on-error: true
             
             - name: Build process
-              if: steps.check_changes.outputs.build_needed == 'true'
+              if: steps.check_changes.outputs.build_needed == 'true' || needs.build.outputs.buildType == 'force'
               run: |
                 echo "On build"
                 # Add your build steps here
 
-            - name: Add Label to Pull Request
-              if: steps.check_changes.outputs.build_needed == 'true'
-              run: |
-                # Fetch the pull request number
-                PR_NUMBER=$(gh pr view --json number --jq .number || echo "null")
+            - name: try something
+              run: echo ${{ needs.build.outputs.buildType }}
+   
+            - name: Add labels to PR
+              if: needs.build.outputs.buildType == 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || needs.build.outputs.buildType == 'force')
+              uses: actions-ecosystem/action-add-labels@v1
+              with:
+                labels: |
+                  ${{ matrix.directory }}
+                number: ${{ github.event.client_payload.pull_request_number }}
 
-                if [ "$PR_NUMBER" != "null" ]; then
-                    # Add a label to the pull request
-                    gh pr edit $PR_NUMBER --add-label "${{ matrix.directory }}"
-                else
-                    echo "No pull request found, skipping labeling."
-                fi
-              env:
-                GH_TOKEN: ${{ github.token }}
-              
+            - name: No Label this is not a pull_request
+              if: needs.build.outputs.buildType != 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || needs.build.outputs.buildType == 'force' )
+              run: echo "This is not a pull request, skipping label addition."
