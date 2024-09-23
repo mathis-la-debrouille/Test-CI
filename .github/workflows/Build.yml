@@ -110,6 +110,7 @@ jobs:
               with:
                 labels: |
                   ${{ matrix.directory }}
+                number: ${{ github.event.number }}
 
             - name: No Label this is not a pull_request
               if: needs.build.outputs.buildType != 'pull_request' && (steps.check_changes.outputs.build_needed == 'true' || needs.build.outputs.buildType == 'force' )
