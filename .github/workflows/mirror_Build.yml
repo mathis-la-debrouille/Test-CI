@@ -1,0 +1,102 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  Get_services:
+    runs-on: ubuntu-20.04
+    outputs:
+      service_list: ${{ steps.get_services.outputs.services }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          fetch-depth: 2
+
+      - name: Get list of services
+        id: get_services
+        run: |
+          # Finding directories starting with "service-" in src/packages
+          service_list=$(find ./packages -type d -name 'service-*' -exec basename {} \;)
+          echo "Found services:"
+          echo "$service_list"
+          
+          # Join the list into a comma-separated string
+          service_list=$(echo "$service_list" | tr '\n' ',')
+          service_list="${service_list%,}"  # Remove trailing comma
+
+          echo "service_list=$service_list" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+  Check_changes:
+    runs-on: ubuntu-20.04
+    needs: Get_services
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          fetch-depth: 2
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          # Retrieve the service list from Get_services job
+          service_list="${{ needs.Get_services.outputs.service_list }}"
+          IFS=',' read -ra services <<< "$service_list"
+          
+          echo "Found changed files:"
+          changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "$changed_files"
+
+          build_needed="false"
+
+          for service in "${services[@]}"; do
+            for file in $changed_files; do
+              if [[ "$file" == "src/packages/$service"* ]]; then
+                echo "$file changed in $service"
+                build_needed="true"
+                break 2
+              fi
+            done
+          done
+
+          if [[ "$build_needed" == "true" ]]; then
+            echo "On build"
+            echo "::set-output name=build_needed::true"
+          else
+            echo "Pas de build"
+            echo "::set-output name=build_needed::false"
+          fi
+        shell: bash
+
+  Deploy_services:
+    runs-on: ubuntu-latest
+    needs: [Check_changes]
+    if: needs.Check_changes.outputs.build_needed == 'true'
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.Get_services.outputs.service_list) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          fetch-depth: 2
+
+      - name: Deploy Service
+        run: |
+          echo "Deploying service: ${{ matrix.service }}"
+          echo "build"
