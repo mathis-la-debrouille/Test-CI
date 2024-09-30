@@ -35,7 +35,7 @@ jobs:
 
           echo "-----------------------------"
           echo "$service_list"
-          echo "service_list=$service_list" >> "$GITHUB_OUTPUT"``
+          echo "service_list=$service_list" >> "$GITHUB_OUTPUT"
           echo "${{toJson(env)}}"
           echo $GITHUB_OUTPUT
         shell: bash
