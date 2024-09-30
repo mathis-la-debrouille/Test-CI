@@ -58,6 +58,7 @@ jobs:
         run: |
           # Retrieve the service list from Get_services job
           service_list="${{ needs.get_services.outputs.service_list }}"
+          echo "${{toJson(needs.get_services)}}"
           echo "check---------------------"
           echo $service_list
           echo "check---------------------"
