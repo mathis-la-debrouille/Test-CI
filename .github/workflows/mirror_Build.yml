@@ -33,6 +33,8 @@ jobs:
           service_list=$(echo "$service_list" | tr '\n' ',')
           service_list="${service_list%,}"  # Remove trailing comma
 
+          echo "-----------------------------"
+          echo "$service_list"
           echo "service_list=$service_list" >> "$GITHUB_OUTPUT"``
           echo "${{toJson(job)}}"
         shell: bash
@@ -58,7 +60,7 @@ jobs:
         run: |
           # Retrieve the service list from Get_services job
           service_list="${{ needs.get_services.outputs.service_list }}"
-          echo "${{toJson(needs.get_services)}}"
+          echo "${{toJson(needs.get_services.outputs)}}"
           echo "check---------------------"
           echo $service_list
           echo "check---------------------"
