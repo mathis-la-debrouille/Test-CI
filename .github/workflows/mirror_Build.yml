@@ -110,7 +110,9 @@ jobs:
           echo ///
           echo ${{ format('[{0}]', needs.check_changes.outputs.modifiedServices)  }}
           echo ///
-          echo ${{ fromJson(format('"[{0}]"', needs.check_changes.outputs.modifiedServices)) }}
+          echo ${{ format('["{0}"]', join('","', needs.check_changes.outputs.modifiedServices)) }}
+          echo ///
+          echo ${{ join('","', needs.check_changes.outputs.modifiedServices) }}
           echo ///
           echo "Deploying modified service: ${{ matrix.service }}"
           echo "build"
