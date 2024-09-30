@@ -100,7 +100,7 @@ jobs:
         
       - name: Json formatting
         run: |
-          edited=$(echo "${{ format('[{0}]', steps.arrayformat.outputs.value) }}")
+          edited=$(echo "${{  steps.arrayformat.outputs.value }}")
           echo "$edited"
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))}}
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))[0]}}
@@ -112,7 +112,7 @@ jobs:
     if: needs.check_changes.outputs.modifiedServices != ''
     strategy:
       matrix:
-        service: ${{fromJson(needs.check_changes.outputs.editedModifiedServices) }}
+        service: ${{fromJson(format('[{0}]', needs.check_changes.outputs.editedModifiedServices)) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
