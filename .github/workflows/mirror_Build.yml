@@ -109,7 +109,7 @@ jobs:
         run: |
           echo ${{ needs.check_changes.outputs.modifiedServices }}
           echo ///
-          echo ${{ format('[{0}]', fromJson(needs.check_changes.outputs.modifiedServices) ) }}
+          echo ${{ format('[{0}]', needs.check_changes.outputs.modifiedServices)  }}
           echo ///
           echo ${{ format('[{0}]', needs.check_changes.outputs.modifiedServices) }}
           echo ///
