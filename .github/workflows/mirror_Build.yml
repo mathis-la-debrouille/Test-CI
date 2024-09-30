@@ -36,7 +36,7 @@ jobs:
           echo "-----------------------------"
           echo "$service_list"
           echo "service_list=$service_list" >> "$GITHUB_OUTPUT"``
-          echo "${{toJson(job)}}"
+          echo "${{toJson(env)}}"
         shell: bash
 
   check_changes:
