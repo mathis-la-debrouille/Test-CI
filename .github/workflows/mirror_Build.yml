@@ -13,7 +13,7 @@ jobs:
   get_services:
     runs-on: ubuntu-20.04
     outputs:
-      service_list: ${{ steps.get_services.outputs.services }}
+      services: ${{ steps.get_services.outputs.services }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
 
           echo "-----------------------------"
           echo "$service_list"
-          echo "service_list=$service_list" >> "$GITHUB_OUTPUT"
+          echo "services=$service_list" >> $GITHUB_OUTPUT
           echo "${{toJson(env)}}"
           echo $GITHUB_OUTPUT
         shell: bash
@@ -60,7 +60,7 @@ jobs:
         id: check_changes
         run: |
           # Retrieve the service list from Get_services job
-          service_list="${{ needs.get_services.outputs.service_list }}"
+          service_list="${{ needs.get_services.outputs.services }}"
           echo "${{toJson(needs.get_services.outputs)}}"
           echo "check---------------------"
           echo $service_list
