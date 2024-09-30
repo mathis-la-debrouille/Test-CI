@@ -1,4 +1,4 @@
-name: Build
+name: Dynamic Matrix
 
 on:
   pull_request:
