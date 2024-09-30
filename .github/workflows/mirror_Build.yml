@@ -103,6 +103,7 @@ jobs:
           edited=$(echo "${{ format('[{0}]', steps.arrayformat.outputs.value) }}")
           echo "$edited"
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))}}
+          echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))[0]}}
           echo "editedModifiedServices=$edited" >> $GITHUB_OUTPUT
 
   deploy_services:
