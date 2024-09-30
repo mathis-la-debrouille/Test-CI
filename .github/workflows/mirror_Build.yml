@@ -1,4 +1,4 @@
-name: Build
+name: Dynamic Matrix SURE
 
 on:
   pull_request:
