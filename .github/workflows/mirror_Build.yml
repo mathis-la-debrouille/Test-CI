@@ -106,7 +106,7 @@ jobs:
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))[0]}}
           echo -e "editedModifiedServices=${{steps.arrayformat.outputs.value}}" >> $GITHUB_OUTPUT
           echo "$GITHUB_OUTPUT"
-          cat -A $GITHUB_OUTPUT | echo -e
+          cat -A $GITHUB_OUTPUT
 
   deploy_services:
     runs-on: ubuntu-latest
@@ -130,5 +130,6 @@ jobs:
           echo ${{ matrix.service }}
           echo ///
           echo ${{needs.check_changes.outputs.editedModifiedServices}}
+          cat -A $GITHUB_OUTPUT
           echo "Deploying modified service: ${{ matrix.service }}"
           echo "build"
