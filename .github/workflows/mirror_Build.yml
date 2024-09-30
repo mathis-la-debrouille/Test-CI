@@ -78,6 +78,7 @@ jobs:
           modified_services=$(IFS=,; echo "${modified_services[*]}")
           echo "Modified services: $modified_services"
           echo "modified_services=$modified_services" >> "$GITHUB_OUTPUT"
+          echo ${{ fromJson(format('["{0}"]', join('","', steps.check_changes.outputs.modified_services))) }}
         shell: bash
 
   deploy_services:
@@ -86,7 +87,8 @@ jobs:
     if: needs.check_changes.outputs.modified_services != ''
     strategy:
       matrix:
-        service: ${{ fromJson('["' + replace(needs.check_changes.outputs.modified_services, ',', '","') + '"]') }}
+        # ! tout pourris
+        service: ${{ fromJson(format('["{0}"]', join('","', needs.check_changes.outputs.modified_services))) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
