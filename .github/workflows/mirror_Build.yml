@@ -116,7 +116,10 @@ jobs:
     needs: get_changes
     strategy:
       matrix:
-        service: ${{fromJson(format('["{0}"]', needs.get_changes.outputs.editedModifiedServices))}}
+        service: [
+          temp,
+          test
+        ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
