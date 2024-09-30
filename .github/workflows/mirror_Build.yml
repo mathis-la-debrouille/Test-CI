@@ -28,16 +28,11 @@ jobs:
           service_list=$(find ./packages -type d -name 'service-*' -exec basename {} \;)
           echo "Found services:"
           echo "$service_list"
-          echo "after-----------------"
           # Join the list into a comma-separated string
           service_list=$(echo "$service_list" | tr '\n' ',')
           service_list="${service_list%,}"  # Remove trailing comma
 
-          echo "-----------------------------"
-          echo "$service_list"
           echo "services=$service_list" >> $GITHUB_OUTPUT
-          echo "${{toJson(env)}}"
-          echo $GITHUB_OUTPUT
         shell: bash
 
   get_changes:
