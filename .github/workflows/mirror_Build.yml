@@ -126,7 +126,12 @@ jobs:
 
       - name: Deploy Service
         run: |
-          echo ${{ format('"[{0}]"', needs.get_changes.outputs.editedModifiedServices) }}
+          echo ${{ format('[{0}]', needs.get_changes.outputs.editedModifiedServices) }}
+          echo ///
+          echo ${{ fromJson(format('[{0}]', needs.get_changes.outputs.editedModifiedServices)) }}
+          echo ///
+          echo ${{ fromJson(format('[{0}]', needs.get_changes.outputs.editedModifiedServices))[0] }}
+          echo ///
           echo ${{ matrix.service }}
           echo ///
           echo ${{needs.get_changes.outputs.editedModifiedServices}}
