@@ -106,7 +106,7 @@ jobs:
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))[0]}}
           echo "editedModifiedServices=$edited" >> $GITHUB_OUTPUT
           echo "$GITHUB_OUTPUT"
-          cat $GITHUB_OUTPUT
+          cat -A $GITHUB_OUTPUT
 
   deploy_services:
     runs-on: ubuntu-latest
