@@ -24,20 +24,12 @@ jobs:
       - name: Get list of services
         id: get_services
         run: |
-          # Finding directories starting with "service-" in src/packages
           service_list=$(find ./packages -type d -name 'service-*' -exec basename {} \;)
-          echo "Found services:"
-          echo "$service_list"
-          echo "after-----------------"
           # Join the list into a comma-separated string
           service_list=$(echo "$service_list" | tr '\n' ',')
           service_list="${service_list%,}"  # Remove trailing comma
 
-          echo "-----------------------------"
-          echo "$service_list"
           echo "services=$service_list" >> $GITHUB_OUTPUT
-          echo "${{toJson(env)}}"
-          echo $GITHUB_OUTPUT
         shell: bash
 
   get_changes:
@@ -62,14 +54,7 @@ jobs:
         run: |
           # Retrieve the service list from Get_services job
           service_list="${{ needs.get_services.outputs.services }}"
-          echo "${{toJson(needs.get_services.outputs)}}"
-          echo "check---------------------"
-          echo $service_list
-          echo "check---------------------"
           IFS=',' read -ra services <<< "$service_list"
-          echo "Found changed files:"
-          changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
-          echo "$changed_files"
 
           modified_services=()
           for service in "${services[@]}"; do
@@ -97,15 +82,6 @@ jobs:
           find: ','
           replace: '","'
           replaceAll: true
-        
-      - name: Json test
-        id: jsonformat
-        run: |
-          edited=$(echo "${{ steps.arrayformat.outputs.value }}")
-          echo "$edited"
-          echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))}}
-          echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))[0]}}
-        shell: bash
 
   deploy_services:
     runs-on: ubuntu-latest
@@ -124,11 +100,5 @@ jobs:
 
       - name: Deploy Service
         run: |
-          echo ${{needs.get_changes.outputs.editedModifiedServices}}
-          echo ${{ fromJson(format('[{0}]', needs.get_changes.outputs.editedModifiedServices))}}
-          echo ${{ fromJson(format('[{0}]', needs.get_changes.outputs.editedModifiedServices))[0]}}
-          echo ${{ matrix.service }}
-          echo ///
-          cat -A $GITHUB_OUTPUT
           echo "Deploying modified service: ${{ matrix.service }}"
           echo "build"
