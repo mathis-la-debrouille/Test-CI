@@ -126,7 +126,7 @@ jobs:
 
       - name: Deploy Service
         run: |
-          echo ${{fromJson(toJson(format('"[{0}]"', needs.check_changes.outputs.editedModifiedServices))) }}
+          echo ${{ format('"[{0}]"', needs.check_changes.outputs.editedModifiedServices) }}
           echo ${{ matrix.service }}
           echo ///
           echo ${{needs.check_changes.outputs.editedModifiedServices}}
