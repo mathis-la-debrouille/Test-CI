@@ -104,7 +104,7 @@ jobs:
           echo "$edited"
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))}}
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))[0]}}
-          echo "editedModifiedServices=${{steps.arrayformat.outputs.value}}" >> $GITHUB_OUTPUT
+          echo -e "editedModifiedServices=${{steps.arrayformat.outputs.value}}" >> $GITHUB_OUTPUT
           echo "$GITHUB_OUTPUT"
           cat -A $GITHUB_OUTPUT
 
@@ -114,7 +114,7 @@ jobs:
     if: needs.check_changes.outputs.editedModifiedServices != ''
     strategy:
       matrix:
-        service: ${{fromJson(toJson(format('[{0}]', needs.check_changes.outputs.editedModifiedServices))) }}
+        service: ${{fromJson(toJson(format('"[{0}]"', needs.check_changes.outputs.editedModifiedServices))) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
