@@ -74,7 +74,7 @@ jobs:
           for service in "${services[@]}"; do
             for file in $changed_files; do
               echo "im here $service and $file"
-              if [[ "$file" == "./packages/$service"* ]]; then
+              if [[ "$file" == "packages/$service"* ]]; then
                 echo "$file changed in $service"
                 modified_services+=("$service")
                 break
