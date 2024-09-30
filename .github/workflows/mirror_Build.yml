@@ -109,9 +109,9 @@ jobs:
         run: |
           echo ${{ needs.check_changes.outputs.modifiedServices }}
           echo ///
-          echo ${{ format('[{0}]', toJson(needs.modifiedServices.outputs.modifiedServices) ) }}
+          echo ${{ format('[{0}]', fromJson(needs.check_changes.outputs.modifiedServices) ) }}
           echo ///
-          echo ${{ format('[{0}]', needs.modifiedServices.outputs.modifiedServices) }}
+          echo ${{ format('[{0}]', needs.check_changes.outputs.modifiedServices) }}
           echo ///
           echo "Deploying modified service: ${{ matrix.service }}"
           echo "build"
