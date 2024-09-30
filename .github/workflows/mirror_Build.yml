@@ -93,13 +93,14 @@ jobs:
         id: arrayformat
         uses: mad9000/actions-find-and-replace-string@5
         with:
-          source: ${{ steps.check_changes.outputs.modifiedServices }} # this translates to ref/heads/main on the main branch, but can be any arbitrary string 
+          source: ${{ toJson(steps.check_changes.outputs.modifiedServices) }}
           find: ','
           replace: '","'
           replaceAll: true
         
       - name: Json formatting
         run: |
+          echo ${{steps.arrayformat.outputs.value}}
           $edited=${{format('["{0}"]',steps.arrayformat.outputs.value)}}
           echo "editedModifiedServices=$edited" >> $GITHUB_OUTPUT
         shell: bash
