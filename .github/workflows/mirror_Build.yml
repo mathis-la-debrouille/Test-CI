@@ -130,11 +130,7 @@ jobs:
       - name: Deploy Service
         run: |
           echo ${{needs.get_changes.outputs.editedModifiedServices}}
-          echo ${{ fromJson( needs.get_changes.outputs.editedModifiedServices) }}
-          echo ///
 
-          echo ${{ fromJson(needs.get_changes.outputs.editedModifiedServices)[0] }}
-          echo ///
           echo ${{ matrix.service }}
           echo ///
           echo ${{needs.get_changes.outputs.editedModifiedServices}}
