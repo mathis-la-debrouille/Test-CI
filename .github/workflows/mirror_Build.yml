@@ -100,11 +100,12 @@ jobs:
         
       - name: Json formatting
         run: |
-          edited=$(echo "${{  steps.arrayformat.outputs.value }}")
+          edited=$(echo "${{ steps.arrayformat.outputs.value }}")
           echo "$edited"
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))}}
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))[0]}}
           echo "editedModifiedServices=$edited" >> $GITHUB_OUTPUT
+          echo "$GITHUB_OUTPUT"
 
   deploy_services:
     runs-on: ubuntu-latest
@@ -112,7 +113,7 @@ jobs:
     if: needs.check_changes.outputs.modifiedServices != ''
     strategy:
       matrix:
-        service: ${{fromJson(format('["{0}"]', needs.check_changes.outputs.editedModifiedServices)) }}
+        service: ${{fromJson(format('[{0}]', needs.check_changes.outputs.editedModifiedServices)) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
