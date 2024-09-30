@@ -96,7 +96,7 @@ jobs:
     if: needs.check_changes.outputs.modifiedServices != ''
     strategy:
       matrix:
-        service: ${{fromJson(format('"["{0}"]"', join('","', needs.check_changes.outputs.modifiedServices))) }}
+        service: ${{fromJson(format('["{0}"]', join('","', needs.check_changes.outputs.modifiedServices))) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
