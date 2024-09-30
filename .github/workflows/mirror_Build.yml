@@ -104,7 +104,7 @@ jobs:
           echo "$edited"
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))}}
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))[0]}}
-          echo "editedModifiedServices=$edited" >> $GITHUB_OUTPUT
+          echo "editedModifiedServices=${{steps.arrayformat.outputs.value}}" >> $GITHUB_OUTPUT
           echo "$GITHUB_OUTPUT"
           cat -A $GITHUB_OUTPUT
 
