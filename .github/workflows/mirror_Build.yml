@@ -25,10 +25,10 @@ jobs:
         id: get_services
         run: |
           # Finding directories starting with "service-" in src/packages
-          service_list=$(find ./package/ -type d -name 'service-*' -exec basename {} \;)
+          service_list=$(find ./package -type d -name 'service-*' -exec basename {} \;)
           echo "Found services:"
           echo "$service_list"
-          
+          echo "after-----------------"
           # Join the list into a comma-separated string
           service_list=$(echo "$service_list" | tr '\n' ',')
           service_list="${service_list%,}"  # Remove trailing comma
@@ -58,7 +58,9 @@ jobs:
           # Retrieve the service list from Get_services job
           service_list="${{ needs.get_services.outputs.service_list }}"
           IFS=',' read -ra services <<< "$service_list"
-          
+          echo "check---------------------"
+          echo $service_list
+          echo "check---------------------"
           echo "Found changed files:"
           changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
           echo "$changed_files"
