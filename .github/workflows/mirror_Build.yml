@@ -79,6 +79,7 @@ jobs:
           echo "Modified services: $modified_services"
           echo "modified_services=$modified_services" >> "$GITHUB_OUTPUT"
           echo ${{ format('["{0}"]', join('","', steps.check_changes.outputs.modified_services)) }}
+
         shell: bash
 
   deploy_services:
