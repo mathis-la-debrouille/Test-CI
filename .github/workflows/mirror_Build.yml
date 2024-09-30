@@ -25,7 +25,7 @@ jobs:
         id: get_services
         run: |
           # Finding directories starting with "service-" in src/packages
-          service_list=$(find ./package -type d -name 'service-*' -exec basename {} \;)
+          service_list=$(find ./packages -type d -name 'service-*' -exec basename {} \;)
           echo "Found services:"
           echo "$service_list"
           echo "after-----------------"
