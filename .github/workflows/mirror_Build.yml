@@ -86,7 +86,7 @@ jobs:
           modified_services=$(IFS=,; echo "${modified_services[*]}")
           echo "Modified services: $modified_services"
           echo "modifiedServices=$modified_services" >> $GITHUB_OUTPUT
-          echo ${{ format('["{0}"]', join('","', steps.check_changes.outputs.modified_services)) }}
+          echo ${{ format('["{0}"]', join('","', steps.check_changes.outputs.modifiedServices)) }}
 
         shell: bash
 
@@ -107,5 +107,11 @@ jobs:
 
       - name: Deploy Service
         run: |
+          echo ${{ needs.check_changes.outputs.modifiedServices }}
+          echo ///
+          echo ${{ toJson(fromJson(format('["{0}"]', join('","', needs.check_changes.outputs.modifiedServices)))) }}
+          echo ///
+          echo ${{ fromJson(format('["{0}"]', join('","', needs.check_changes.outputs.modifiedServices))) }}
+          echo ///
           echo "Deploying modified service: ${{ matrix.service }}"
           echo "build"
