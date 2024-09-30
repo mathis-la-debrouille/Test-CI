@@ -114,7 +114,7 @@ jobs:
     if: needs.check_changes.outputs.editedModifiedServices != ''
     strategy:
       matrix:
-        service: [temp]
+        service: [temp, et]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
