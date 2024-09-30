@@ -97,7 +97,7 @@ jobs:
     strategy:
       matrix:
         # ! tout pourris
-        service: ${{ fromJson(format('[{0}]', needs.check_changes.outputs.modifiedServices)) }}
+        service: ${{ fromJson(format('["{0}"]', join('","', needs.check_changes.outputs.modifiedServices))) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -111,7 +111,7 @@ jobs:
           echo ///
           echo ${{ format('[{0}]', needs.check_changes.outputs.modifiedServices)  }}
           echo ///
-          echo ${{ fromJson(format('[{0}]', needs.check_changes.outputs.modifiedServices)) }}
+          echo ${{ fromJson(format('"[{0}]"', needs.check_changes.outputs.modifiedServices)) }}
           echo ///
           echo "Deploying modified service: ${{ matrix.service }}"
           echo "build"
