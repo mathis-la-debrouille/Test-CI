@@ -100,7 +100,7 @@ jobs:
         
       - name: Json formatting
         run: |
-          edited=$(echo "${{ format('[{0}]', steps.arrayformat.outputs.value) }}")
+          edited=$(echo "${{ format('["\{0}\"]', steps.arrayformat.outputs.value) }}")
           echo "$edited"
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))}}
           echo "editedModifiedServices=$edited" >> $GITHUB_OUTPUT
