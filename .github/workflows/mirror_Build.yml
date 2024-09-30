@@ -124,5 +124,6 @@ jobs:
         run: |
           echo ${{ matrix.service }}
           echo ///
+          echo ${{needs.check_changes.outputs.editedModifiedServices}}
           echo "Deploying modified service: ${{ matrix.service }}"
           echo "build"
