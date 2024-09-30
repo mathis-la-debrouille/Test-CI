@@ -13,7 +13,7 @@ jobs:
   get_services:
     runs-on: ubuntu-20.04
     outputs:
-      service_list: ${{ steps.get_services.outputs.services }}
+      services: ${{ steps.get_services.outputs.services }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -28,12 +28,16 @@ jobs:
           service_list=$(find ./packages -type d -name 'service-*' -exec basename {} \;)
           echo "Found services:"
           echo "$service_list"
-          
+          echo "after-----------------"
           # Join the list into a comma-separated string
           service_list=$(echo "$service_list" | tr '\n' ',')
           service_list="${service_list%,}"  # Remove trailing comma
 
-          echo "service_list=$service_list" >> "$GITHUB_OUTPUT"
+          echo "-----------------------------"
+          echo "$service_list"
+          echo "services=$service_list" >> $GITHUB_OUTPUT
+          echo "${{toJson(env)}}"
+          echo $GITHUB_OUTPUT
         shell: bash
 
   check_changes:
@@ -56,9 +60,12 @@ jobs:
         id: check_changes
         run: |
           # Retrieve the service list from Get_services job
-          service_list="${{ needs.get_services.outputs.service_list }}"
+          service_list="${{ needs.get_services.outputs.services }}"
+          echo "${{toJson(needs.get_services.outputs)}}"
+          echo "check---------------------"
+          echo $service_list
+          echo "check---------------------"
           IFS=',' read -ra services <<< "$service_list"
-          
           echo "Found changed files:"
           changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
           echo "$changed_files"
@@ -66,7 +73,8 @@ jobs:
           modified_services=()
           for service in "${services[@]}"; do
             for file in $changed_files; do
-              if [[ "$file" == "src/packages/$service"* ]]; then
+              echo "im here $service"
+              if [[ "$file" == "./packages/$service"* ]]; then
                 echo "$file changed in $service"
                 modified_services+=("$service")
                 break
