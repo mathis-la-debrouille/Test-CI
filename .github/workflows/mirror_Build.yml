@@ -1,4 +1,4 @@
-name: Dynamic Matrix
+name: Dynamic Matrix SURE
 
 on:
   pull_request:
