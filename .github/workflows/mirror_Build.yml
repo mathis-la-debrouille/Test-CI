@@ -33,7 +33,8 @@ jobs:
           service_list=$(echo "$service_list" | tr '\n' ',')
           service_list="${service_list%,}"  # Remove trailing comma
 
-          echo "service_list=$service_list" >> "$GITHUB_OUTPUT"
+          echo "service_list=$service_list" >> "$GITHUB_OUTPUT"``
+          echo "${{jobs.get_services.outputs.service_list}}"
         shell: bash
 
   check_changes:
