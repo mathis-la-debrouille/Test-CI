@@ -40,12 +40,12 @@ jobs:
           echo $GITHUB_OUTPUT
         shell: bash
 
-  check_changes:
+  get_changes:
     runs-on: ubuntu-20.04
     needs: get_services
     outputs:
       modifiedServices: ${{ steps.check_changes.outputs.modifiedServices }}
-      editedModifiedServices: ${{ steps.check_changes.outputs.editedModifiedServices }}
+      editedModifiedServices: ${{ steps.jsonformat.outputs.editedModifiedServices }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -99,17 +99,21 @@ jobs:
           replaceAll: true
         
       - name: Json formatting
+        id: jsonformat
         run: |
           edited=$(echo "${{ steps.arrayformat.outputs.value }}")
           echo "$edited"
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))}}
           echo ${{fromJson(format('[{0}]', steps.arrayformat.outputs.value))[0]}}
-          echo -e "editedModifiedServices='${{steps.arrayformat.outputs.value}}'" >> $GITHUB_OUTPUT
+          echo -e "editedModifiedServices='${{steps.arrayformat.outputs.value}}'
+          " >> $GITHUB_OUTPUT
         shell: bash
 
   deploy_services:
     runs-on: ubuntu-latest
-    needs: check_changes
+    permissions:
+          issues: write
+    needs: get_changes
     strategy:
       matrix:
         service: [
@@ -125,10 +129,10 @@ jobs:
 
       - name: Deploy Service
         run: |
-          echo ${{ format('"[{0}]"', needs.check_changes.outputs.editedModifiedServices) }}
+          echo ${{ format('"[{0}]"', needs.get_changes.outputs.editedModifiedServices) }}
           echo ${{ matrix.service }}
           echo ///
-          echo ${{needs.check_changes.outputs.editedModifiedServices}}
+          echo ${{needs.get_changes.outputs.editedModifiedServices}}
           cat -A $GITHUB_OUTPUT
           echo "Deploying modified service: ${{ matrix.service }}"
           echo "build"
