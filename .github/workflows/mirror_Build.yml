@@ -62,19 +62,13 @@ jobs:
         run: |
           # Retrieve the service list from Get_services job
           service_list="${{ needs.get_services.outputs.services }}"
-          echo "${{toJson(needs.get_services.outputs)}}"
-          echo "check---------------------"
-          echo $service_list
-          echo "check---------------------"
           IFS=',' read -ra services <<< "$service_list"
           echo "Found changed files:"
           changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
-          echo "$changed_files"
 
           modified_services=()
           for service in "${services[@]}"; do
             for file in $changed_files; do
-              echo "im here $service and $file"
               if [[ "$file" == "packages/$service"* ]]; then
                 echo "$file changed in $service"
                 modified_services+=("$service")
@@ -85,7 +79,6 @@ jobs:
 
           # Join the modified services into a comma-separated list
           modified_services=$(IFS=,; echo "${modified_services[*]}")
-          echo "Modified services: $modified_services"
           echo "modifiedServices=$modified_services" >> $GITHUB_OUTPUT
         shell: bash
 
