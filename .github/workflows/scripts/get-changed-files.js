@@ -10,6 +10,7 @@ console.log('Found services:', serviceDirs);
 
 // Load the list of changed files from the environment variable
 let changedFiles = process.env.CHANGED_FILES || '[]';
+console.log("qu'est il advenu", changedFiles);
 try {
   changedFiles = JSON.parse(changedFiles);
   if (!Array.isArray(changedFiles)) {
