@@ -1,28 +1,49 @@
-// get-changed-files.js
 const fs = require('fs');
 const path = require('path');
 
-// Find directories starting with 'service-' in 'packages'
-const basePath = path.resolve('packages');
-const serviceDirs = fs.readdirSync(basePath).filter(dir => dir.startsWith('service-'));
+try {
+    const basePath = path.resolve('packages');
+    if (!fs.existsSync(basePath)) {
+        throw new Error(`The base directory "packages" does not exist at path: ${basePath}`);
+    }
+  
+    const serviceDirs = fs.readdirSync(basePath).filter(dir => dir.startsWith('service-'));
 
-console.log('Found services:', serviceDirs);
+    console.log('Found services:', serviceDirs);
 
-// Load the list of changed files from the environment variable
-let changedFiles = process.env.CHANGED_FILES || '';
-console.log("Raw CHANGED_FILES:", changedFiles);
+    let changedFiles = process.env.CHANGED_FILES || '';
 
-// Split the changedFiles string into an array by spaces
-changedFiles = changedFiles.trim().split(/\s+/);
+    changedFiles = changedFiles.trim().split(/\s+/);
 
-console.log('Changed files as an array:', changedFiles);
+    if (changedFiles.length === 0)
+        console.warn('No changed files detected or CHANGED_FILES was empty.');
 
-// Determine which services have been modified
-const modifiedServices = serviceDirs.filter(service =>
-  changedFiles.some(file => file.startsWith(`packages/${service}`))
-);
+    console.log('Changed files:', changedFiles);
 
-console.log('Modified services:', modifiedServices);
+    let modifiedServices;
+    try {
+        modifiedServices = serviceDirs.filter(service =>
+            changedFiles.some(file => file.startsWith(`packages/${service}`))
+        );
+    } catch (err) {
+        console.error(`Error while determining modified services: ${err.message}`);
+        modifiedServices = [];
+    }
 
-// Output the result as a JSON string for GitHub Actions
-console.log(`::set-output name=modifiedServices::${JSON.stringify(modifiedServices)}`);
+    if (modifiedServices.length === 0)
+        console.warn('No modified services detected.');
+
+    console.log('Modified services:', modifiedServices);
+
+    try {
+        const output = JSON.stringify(modifiedServices);
+        console.log(`::set-output name=modifiedServices::${output}`);
+    } catch (err) {
+        console.error(`Failed to stringify modified services: ${err.message}`);
+        console.log(`::set-output name=modifiedServices::[]`); // Set to an empty array if stringification fails
+    }
+
+} catch (error) {
+  console.error(`An unexpected error occurred: ${error.message}`);
+  console.log('::set-output name=modifiedServices::[]'); // Ensure that the output is set to an empty array on failure
+}
