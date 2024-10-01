@@ -27,7 +27,7 @@ jobs:
       - name: Identify modified services
         id: node_script
         run: |
-          node .github/workflow/script/get-changed-files.js
+          node .github/workflow/scripts/get-changed-files.js
         env:
           CHANGED_FILES: ${{ toJson(steps.changed-files.outputs.all_changed_files) }}
 
