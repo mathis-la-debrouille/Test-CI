@@ -13,7 +13,9 @@ jobs:
   get_services:
     runs-on: ubuntu-20.04
     outputs:
-      services: ${{ steps.get_services.outputs.services }}
+      services: ${{ steps.check_changes.outputs.services }}
+      modifiedServices: ${{ steps.check_changes.outputs.modifiedServices }}
+      editedModifiedServices: ${{ steps.arrayformat.outputs.value }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -31,22 +33,9 @@ jobs:
           # Join the list into a comma-separated string
           service_list=$(echo "$service_list" | tr '\n' ',')
           service_list="${service_list%,}"  # Remove trailing comma
-
+          
           echo "services=$service_list" >> $GITHUB_OUTPUT
         shell: bash
-
-  get_changes:
-    runs-on: ubuntu-20.04
-    needs: get_services
-    outputs:
-      modifiedServices: ${{ steps.check_changes.outputs.modifiedServices }}
-      editedModifiedServices: ${{ steps.arrayformat.outputs.value }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 2
 
       - name: Get changed files
         id: changed-files
@@ -55,8 +44,8 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          # Retrieve the service list from Get_services job
-          service_list="${{ needs.get_services.outputs.services }}"
+          # Retrieve the service list from Get_services step
+          service_list="${{ steps.get_services.outputs.services }}"
           IFS=',' read -ra services <<< "$service_list"
           echo "Found changed files:"
           changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
@@ -90,10 +79,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
           issues: write
-    needs: get_changes
+    needs: get_services
     strategy:
       matrix:
-        service: ${{ fromJson(format('[{0}]', needs.get_changes.outputs.editedModifiedServices)) }}
+        service: ${{ fromJson(format('[{0}]', needs.get_services.outputs.editedModifiedServices)) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
