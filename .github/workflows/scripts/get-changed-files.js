@@ -9,22 +9,13 @@ const serviceDirs = fs.readdirSync(basePath).filter(dir => dir.startsWith('servi
 console.log('Found services:', serviceDirs);
 
 // Load the list of changed files from the environment variable
-let changedFiles = process.env.CHANGED_FILES || '[]';
-console.log("qu'est il advenu", changedFiles);
-changedFiles = changedFiles.split(' ');
-console.log("bah alors", changedFiles);
-console.log("parce que :", changedFiles.split(' '));
-try {
-  changedFiles = JSON.parse(changedFiles);
-  if (!Array.isArray(changedFiles)) {
-    throw new Error('CHANGED_FILES is not an array');
-  }
-} catch (error) {
-  console.error('Failed to parse CHANGED_FILES:', error);
-  changedFiles = [];
-}
+let changedFiles = process.env.CHANGED_FILES || '';
+console.log("Raw CHANGED_FILES:", changedFiles);
 
-console.log('Changed files:', changedFiles);
+// Split the changedFiles string into an array by spaces
+changedFiles = changedFiles.trim().split(/\s+/);
+
+console.log('Changed files as an array:', changedFiles);
 
 // Determine which services have been modified
 const modifiedServices = serviceDirs.filter(service =>
