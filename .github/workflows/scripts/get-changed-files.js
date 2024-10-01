@@ -12,6 +12,8 @@ console.log('Found services:', serviceDirs);
 let changedFiles = process.env.CHANGED_FILES || '[]';
 console.log("qu'est il advenu", changedFiles);
 changedFiles = changedFiles.split(' ');
+console.log("bah alors", changedFiles);
+console.log("parce que :", changedFiles.split(' '));
 try {
   changedFiles = JSON.parse(changedFiles);
   if (!Array.isArray(changedFiles)) {
