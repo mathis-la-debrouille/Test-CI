@@ -16,6 +16,7 @@ jobs:
     needs: fake-build
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         service:
           [
@@ -79,3 +80,60 @@ jobs:
             sleep 2
           done
           echo "Fake ESLint completed."
+
+  fake-buddy:
+    needs: fake-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fake ESLint
+        run: |
+          echo "Starting fake ESLint..."
+          start_time=$(date +%s)
+          while [ $(($(date +%s) - $start_time)) -lt 30 ]; do
+            sleep 1
+            echo "still alive"
+          done
+          echo "Fake ESLint completed."
+
+  terraform-flow-fullwin:
+    needs: fake-build
+    runs-on: ubuntu-latest
+    strategy:
+      # fail-fast: false
+      matrix:
+        service:
+          [
+            service1,
+            service2,
+            service3,
+            service4,
+            service5,
+            service6,
+            service7,
+            service8,
+          ]
+    steps:
+      - name: Fake Connection VPN
+        run: echo "Connecting to VPN for ${{ matrix.service }}..."
+
+      - name: Fake Run Tests
+        run: |
+          echo "Running tests for ${{ matrix.service }}..."
+          start_time=$(date +%s)
+          if [[ "${{ matrix.service }}" == "service1" || "${{ matrix.service }}" == "service2" ]]; then
+          limit=10
+            else
+          limit=20
+            fi
+            while [ $(($(date +%s) - $start_time)) -lt $limit ]; do
+          sleep 2
+          done
+
+      # - name: Fake Error Step
+      #   if: matrix.service == 'service1' || matrix.service == 'service2'
+      #   run: |
+      #     echo "This step will fail..."
+      #     exit 1
+
+      - name: Fake Nomad
+        run: echo "Running Nomad for ${{ matrix.service }}..."
