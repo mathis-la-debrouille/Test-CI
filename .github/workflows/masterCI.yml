@@ -86,6 +86,25 @@ jobs:
           done
           echo "Fake ESLint completed."
 
+      - name: Must continue
+        if: failure() || success()
+        run: |
+          echo "i'm alive"
+
+      - name: Must Still continue
+        if: failure() || success()
+        run: |
+          echo "i'm alive"
+
+      - name: should not be here
+        run: |
+          echo "i'm not alive"
+
+      - name: Maybe continue
+        if: failure() || success()
+        run: |
+          echo "i'm alive"
+
   fake-buddy:
     needs: fake-build
     runs-on: ubuntu-latest
