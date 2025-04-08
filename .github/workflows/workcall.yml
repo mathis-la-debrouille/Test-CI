@@ -1,0 +1,57 @@
+name: Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      buildId:
+        required: true
+        type: string
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: classic Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create ESLint output directory
+        run: mkdir -p eslint-output
+
+      - name: Run ESLint and generate annotations
+        run: |
+          npx eslint "{src,apps,libs,test}/**/*.ts" --format json --output-file eslint-output/eslint-annotations.json || true
+
+      - name: Display ESLint Annotations
+        if: always()
+        run: |
+          if [ -f eslint-output/eslint-annotations.json ]; then
+          echo "ESLint annotations found:"
+          cat eslint-output/eslint-annotations.json
+          else
+          echo "No ESLint annotations file found"
+          ls -la eslint-output
+          exit 1
+          fi
+
+      - name: Apply annotations
+        if: always()
+        uses: ataylorme/eslint-annotate-action@v3
+        with:
+          GITHUB_TOKEN: '${{ github.token }}'
+          report-json: 'eslint-output/eslint-annotations.json'
+          markdown-report-on-step-summary: true
+          only-pr-files: false
+
+      - name: classic Get changes
+        run: git diff --name-only HEAD^1 HEAD
