@@ -2,10 +2,6 @@ name: Reusable Workflow
 
 on:
   workflow_call:
-    inputs:
-      buildId:
-        required: true
-        type: string
 
 jobs:
   eslint:
