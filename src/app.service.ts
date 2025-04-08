@@ -6,4 +6,9 @@ export class AppService {
     const unusedVariable = 'This will cause a lint error';
     return 'Hello World!';
   }
+
+  getHello2(): string {
+    const unusedVariable2 = 'This will cause another lint error';
+    return 'Hello World!';
+  }
 }
