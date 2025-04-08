@@ -11,6 +11,11 @@ on:
 jobs:
   classic-run:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+
     steps:
       - name: Log all github context variables
         run: |
