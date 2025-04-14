@@ -27,6 +27,15 @@ jobs:
           echo "before: ${{ github.event.before }}"
           echo "after: ${{ github.event.after }}"
           echo "sha: ${{ github.sha }}"
-
-  call-eslint:
-    uses: ./.github/workflows/workcall.yml
+          echo "ref: ${{ github.ref }}"
+          echo "ref_name: ${{ github.ref_name }}"
+          echo "ref_type: ${{ github.ref_type }}"
+          echo "ref_protected: ${{ github.ref_protected }}"
+          echo "event: ${{ github.event }}"
+          echo "event_name: ${{ github.event_name }}"
+          echo "event_path: ${{ github.event_path }}"
+          echo "event after: ${{ github.event.after }}"
+          echo "event before: ${{ github.event.before }}"
+          echo "event pull_request: ${{ github.event.pull_request }}"
+          echo "event repository: ${{ github.event.repository }}"
+          echo "event sender: ${{ github.event.sender }}"
