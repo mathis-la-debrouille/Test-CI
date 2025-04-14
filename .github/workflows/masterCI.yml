@@ -11,6 +11,11 @@ on:
 jobs:
   classic-run:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+
     steps:
       - name: Log all github context variables
         run: |
@@ -22,20 +27,23 @@ jobs:
           echo "before: ${{ github.event.before }}"
           echo "after: ${{ github.event.after }}"
           echo "sha: ${{ github.sha }}"
-
-      - name: classic Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-      - name: classic Get changes
-        run: git diff --name-only HEAD^1 HEAD
-
-  push-run:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Get changes
-        run: git diff --name-only ${{ github.event.before }} ${{ github.event.after }}
+          echo "ref: ${{ github.ref }}"
+          echo "ref_name: ${{ github.ref_name }}"
+          echo "ref_type: ${{ github.ref_type }}"
+          echo "ref_protected: ${{ github.ref_protected }}"
+          echo "event: ${{ github.event }}"
+          echo "event_name: ${{ github.event_name }}"
+          echo "event_path: ${{ github.event_path }}"
+          echo "event after: ${{ github.event.after }}"
+          echo "event before: ${{ github.event.before }}"
+          echo "event pull_request: ${{ github.event.pull_request }}"
+          echo "event repository: ${{ github.event.repository }}"
+          echo "event sender: ${{ github.event.sender }}"
+          echo "branch_name: ${{ github.head_ref || github.ref_name }}"
+          echo "---------------------------------"
+          echo "BRANCH INFORMATION:"
+          echo "Current branch: ${{ github.head_ref || github.ref_name }}"
+          echo "Base branch: ${{ github.base_ref || 'N/A' }}"
+          echo "Is PR: ${{ github.event_name == 'pull_request' }}"
+          echo "Is protected branch: ${{ github.ref_protected }}"
+          echo "Branch type: ${{ github.ref_type }}"
