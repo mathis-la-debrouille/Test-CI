@@ -39,3 +39,4 @@ jobs:
           echo "event pull_request: ${{ github.event.pull_request }}"
           echo "event repository: ${{ github.event.repository }}"
           echo "event sender: ${{ github.event.sender }}"
+          echo "branch_name: ${{ github.head_ref || github.ref_name }}"
