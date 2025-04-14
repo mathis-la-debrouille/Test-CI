@@ -47,3 +47,7 @@ jobs:
           echo "Is PR: ${{ github.event_name == 'pull_request' }}"
           echo "Is protected branch: ${{ github.ref_protected }}"
           echo "Branch type: ${{ github.ref_type }}"
+          echo "---------------------------------"
+          echo "EXTRACTED BRANCH INFORMATION:"
+          echo "Current branch (from GITHUB_REF): $(echo $GITHUB_REF | sed 's/refs\/heads\///')"
+          echo "Base branch (for push): ${{ github.event.repository.default_branch }}"
