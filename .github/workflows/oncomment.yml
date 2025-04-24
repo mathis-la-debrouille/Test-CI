@@ -16,10 +16,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup GitHub CLI
-        run: |
-          echo "GH_TOKEN=${{ github.token }}" >> $GITHUB_ENV
-          gh auth status
+      # - name: Setup GitHub CLI
+      #   run: |
+      #     echo "GH_TOKEN=${{ github.token }}" >> $GITHUB_ENV
+      #     gh auth status
 
       - uses: github/branch-deploy@v1.0.0
         id: branch-deploy
