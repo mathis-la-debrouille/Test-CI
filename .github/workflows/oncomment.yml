@@ -21,11 +21,10 @@ jobs:
       #     echo "GH_TOKEN=${{ github.token }}" >> $GITHUB_ENV
       #     gh auth status
 
-      - uses: github/branch-deploy@v1.0.0
+      - uses: github/branch-deploy@v10.4.1
         id: branch-deploy
         with:
           trigger: '.deploy'
-          comment-id: ${{ github.event.comment.id }}
 
       - name: Get the HEAD SHA of the PR
         id: get_pr
