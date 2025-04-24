@@ -28,16 +28,8 @@ jobs:
         with:
           trigger: '.deploy'
 
-      - name: Get the HEAD SHA of the PR
-        id: get_pr
-        run: |
-          PR_NUMBER=${{ github.event.issue.number }}
-          SHA=$(gh api "/repos/${{ github.repository }}/pulls/$PR_NUMBER" --jq '.head.sha')
-          echo "sha=$SHA" >> $GITHUB_OUTPUT
-          echo "Retrieved SHA: $SHA"
-
       - name: display SHA
-        run: echo "head of PR ${{ github.event.issue.number }} is ${{ steps.get_pr.outputs.sha }}"
+        run: echo "head of PR ${{ github.event.issue.number }} is ${{ steps.branch-deploy.outputs.sha }}"
 
       - name: is this a deploy comment?
         id: is_deploy_comment
