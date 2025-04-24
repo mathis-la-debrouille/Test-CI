@@ -1,0 +1,48 @@
+name: On Comment Workflow
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  comment-triggered:
+    runs-on: ubuntu-latest
+    outputs:
+      trigger: ${{ steps.branch-deploy.outputs.continue }}
+      head_sha: ${{ steps.get_pr.outputs.sha }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub CLI
+        run: |
+          echo "GH_TOKEN=${{ github.token }}" >> $GITHUB_ENV
+          gh auth status
+
+      - uses: github/branch-deploy@v1.0.0
+        id: branch-deploy
+        with:
+          trigger: '.deploy'
+          comment-id: ${{ github.event.comment.id }}
+
+      - name: Get the HEAD SHA of the PR
+        id: get_pr
+        run: |
+          PR_NUMBER=${{ github.event.issue.number }}
+          SHA=$(gh api "/repos/${{ github.repository }}/pulls/$PR_NUMBER" --jq '.head.sha')
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+          echo "Retrieved SHA: $SHA"
+
+      - name: display SHA
+        run: echo "head of PR ${{ github.event.issue.number }} is ${{ steps.get_pr.outputs.sha }}"
+
+      - name: is this a deploy comment?
+        id: is_deploy_comment
+        run: |
+          if [[ "${{ github.event.comment.body }}" == *".deploy"* ]]; then
+            echo "This is a deploy comment"
+          else
+            echo "This is not a deploy comment"
+          fi
