@@ -9,26 +9,25 @@ on:
 jobs:
   comment-triggered:
     runs-on: ubuntu-latest
+    outputs:
+      trigger: ${{ steps.branch-deploy.outputs.continue }}
+      head_sha: ${{ steps.get_pr.outputs.sha }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: github/branch-deploy@v1.0.0
+        id: branch-deploy
+        with:
+          trigger: '.deploy'
 
-      - name: Get comment information
-        id: comment
+      - name: Get the HEAD SHA of the PR
+        id: get_pr
         run: |
-          if [ "${{ github.event_name }}" = "issue_comment" ]; then
-            echo "comment_body=${{ github.event.comment.body }}" >> $GITHUB_OUTPUT
-            echo "issue_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
-          else
-            echo "comment_body=${{ github.event.comment.body }}" >> $GITHUB_OUTPUT
-            echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
-          fi
+          echo "gh api /repos/${{ github.repository }}/pulls/${{ github.event.issue.number }} --jq"
+          echo "sha=$(gh api /repos/${{ github.repository }}/pulls/${{ github.event.issue.number }} --jq .head.sha)" >> $GITHUB_OUTPUT
 
-      - name: Process comment
+      - name: display SHA
+        run: echo "head of PR ${{ github.event.issue.number }} is ${{ steps.get_pr.outputs.sha }}"
+
+      - name: is this a deploy comment?
+        id: is_deploy_comment
         run: |
-          echo "Comment body: ${{ steps.comment.outputs.comment_body }}"
-          if [ "${{ github.event_name }}" = "issue_comment" ]; then
-            echo "Processing comment on issue #${{ steps.comment.outputs.issue_number }}"
-          else
-            echo "Processing comment on PR #${{ steps.comment.outputs.pr_number }}"
-          fi
+          echo "is_deploy_comment ${{ steps.get_pr.outputs.sha }}"
