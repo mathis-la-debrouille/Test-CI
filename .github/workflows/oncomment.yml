@@ -9,6 +9,8 @@ on:
 jobs:
   comment-triggered:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     outputs:
       trigger: ${{ steps.branch-deploy.outputs.continue }}
       head_sha: ${{ steps.get_pr.outputs.sha }}
