@@ -39,3 +39,17 @@ jobs:
           else
             echo "This is not a deploy comment"
           fi
+
+      - name: Check if the comment is on a PR
+        id: is_pr_comment
+        run: |
+          if [[ "${{ github.event.issue.pull_request.url }}" != null ]]; then
+            echo "This is a PR comment"
+          else
+            echo "This is not a PR comment"
+          fi
+
+      - name: log ref and base ref
+        run: |
+          echo "ref: ${{ steps.branch-deploy.outputs.ref }}"
+          echo "base ref: ${{ steps.branch-deploy.outputs.base_ref }}"
