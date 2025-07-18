@@ -15,8 +15,11 @@ jobs:
       contents: write
       pull-requests: write
       checks: write
+      deployments: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Log all github context variables
         run: |
           echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
@@ -47,3 +50,11 @@ jobs:
           echo "Is PR: ${{ github.event_name == 'pull_request' }}"
           echo "Is protected branch: ${{ github.ref_protected }}"
           echo "Branch type: ${{ github.ref_type }}"
+
+      - name: Test GitHub Deployments Limit
+        if: github.event_name == 'pull_request'
+        run: ./scripts/test-deployments.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF: ${{ github.head_ref || github.ref_name }}
