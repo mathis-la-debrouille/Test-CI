@@ -13,7 +13,7 @@ readonly GITHUB_REF="${GITHUB_REF:-$GITHUB_SHA}"
 echo "Starting deployment limit test - creating 600 deployments..."
 
 for i in {1..600}; do
-  echo "Creating deployment $i/600"
+  echo "Creating deployment 42 $i/600"
   
   # Create deployment
   DEPLOYMENT_RESPONSE=$(curl -s -X POST \
@@ -22,8 +22,8 @@ for i in {1..600}; do
     "https://api.github.com/repos/${GITHUB_REPOSITORY}/deployments" \
     -d "{
       \"ref\": \"${GITHUB_REF}\",
-      \"environment\": \"test-env-${i}\",
-      \"description\": \"Test deployment ${i}/600 - limit testing\",
+      \"environment\": \"test-env-42\",
+      \"description\": \"Test deployment 42/600 - limit testing\",
       \"auto_merge\": false,
       \"required_contexts\": []
     }")
@@ -31,12 +31,12 @@ for i in {1..600}; do
   DEPLOYMENT_ID=$(echo "${DEPLOYMENT_RESPONSE}" | jq -r '.id')
 
   if [[ "${DEPLOYMENT_ID}" == "null" || -z "${DEPLOYMENT_ID}" ]]; then
-    echo "Error: Failed to create deployment $i"
+    echo "Error: Failed to create deployment 42"
     echo "Response: ${DEPLOYMENT_RESPONSE}"
     exit 1
   fi
 
-  echo "Created deployment $i with ID: ${DEPLOYMENT_ID}"
+  echo "Created deployment 42 with ID: ${DEPLOYMENT_ID}"
 
   # Create deployment status
   curl -s -X POST \
@@ -45,8 +45,8 @@ for i in {1..600}; do
     "https://api.github.com/repos/${GITHUB_REPOSITORY}/deployments/${DEPLOYMENT_ID}/statuses" \
     -d "{
       \"state\": \"success\",
-      \"environment_url\": \"https://test-env-${i}.example.com\",
-      \"description\": \"Test deployment ${i} successful\"
+      \"environment_url\": \"https://test-env-42.example.com\",
+      \"description\": \"Test deployment 42 successful\"
     }" > /dev/null
 
   echo "Deployment $i status set to success"
